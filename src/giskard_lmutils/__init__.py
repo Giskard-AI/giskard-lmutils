@@ -1,2 +1,3 @@
-def hello() -> str:
-    return "Hello from giskard-lmutils!"
+from .model import LiteLLMModel
+
+__all__ = ['LiteLLMModel']

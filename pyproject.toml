@@ -5,7 +5,10 @@ description = "Giskard LLM Utils"
 authors = [
     { name = "Kevin Messiaen", email = "kevin@giskard.ai" }
 ]
-dependencies = []
+dependencies = [
+    "numpy>=2.2.2",
+    "litellm>=1.59.3",
+]
 readme = "README.md"
 requires-python = ">= 3.8"
 
@@ -15,7 +18,10 @@ build-backend = "hatchling.build"
 
 [tool.rye]
 managed = true
-dev-dependencies = []
+dev-dependencies = [
+    "pytest>=8.3.4",
+    "pytest-asyncio>=0.25.2",
+]
 
 [tool.hatch.metadata]
 allow-direct-references = true
