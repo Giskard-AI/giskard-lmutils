@@ -18,7 +18,7 @@ class LiteLLMModel:
         self._embedding_params = (embedding_params or {}) | { 'model': embedding_model }
 
     def _build_completion_params(self, completion_params, messages):
-        return self._litellm_params | completion_params | {'messages': messages}
+        return self._completion_params | completion_params | {'messages': messages}
 
     def _build_embedding_params(self, embedding_params, input):
         return self._embedding_params | embedding_params | {'input': input}
