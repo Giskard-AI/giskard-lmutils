@@ -44,7 +44,6 @@ class LiteLLMModel:
         import torch
         from transformers import AutoTokenizer, AutoModel
 
-
         if self.model is None:
             self.device = "cuda" if torch.cuda.is_available() else "cpu"
             self.tokenizer = AutoTokenizer.from_pretrained(embedding_params['model'])
@@ -59,7 +58,8 @@ class LiteLLMModel:
                 outputs = self.model(**inputs)
             return outputs.last_hidden_state.mean(dim=1).squeeze(0)
 
-        return {"data": [{ "embedding": torch.stack([_get_embedding(d) for d in input]).flatten().tolist()}]}
+        embeddings = torch.stack([_get_embedding(d) for d in input])
+        return {"data": [{"embedding": embeddings.tolist()}]}
 
     
     def embed(self, input: list[str], **embedding_params):
