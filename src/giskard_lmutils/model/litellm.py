@@ -35,14 +35,49 @@ class LiteLLMModel:
 
         return await acompletion(**completion_params)
     
+
+    
+    def _local_embed(self, input: list[str], **embedding_params):
+        import torch
+        from transformers import AutoTokenizer, AutoModel
+
+
+        if self.model is None:
+            self.device = "cuda" if torch.cuda.is_available() else "cpu"
+            self.tokenizer = AutoTokenizer.from_pretrained(embedding_params['model'])
+            self.model = AutoModel.from_pretrained(embedding_params['model']).to(self.device)
+            
+
+        if self.model is None:
+            self.model = AutoModel.from_pretrained(embedding_params['model'])
+
+        def _get_embedding(input: str):
+            inputs = self.tokenizer(
+                input, return_tensors="pt", truncation=True, padding=True
+            ).to(self.device)
+
+            with torch.no_grad():
+                outputs = self.model(**inputs)
+            return outputs.last_hidden_state.mean(dim=1).squeeze(0)
+
+        return torch.stack([_get_embedding(d) for d in input])
+
+    
     def embed(self, input: list[str], **embedding_params):
+       
         from litellm import embedding
         embedding_params = self._build_embedding_params(embedding_params, input)
+
+        if embedding_params.get('is_local', False):
+            return self._local_embed(input, **embedding_params)
 
         return embedding(**embedding_params)
     
     async def aembed(self, input: list[str], **embedding_params):
         from litellm import aembedding
         embedding_params = self._build_embedding_params(embedding_params, input)
+
+        if embedding_params.get('is_local', False):
+            return self._local_embed(input, **embedding_params)
 
         return await aembedding(**embedding_params)
