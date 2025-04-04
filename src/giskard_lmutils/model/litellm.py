@@ -58,8 +58,9 @@ class LiteLLMModel:
                 outputs = self.model(**inputs)
             return outputs.last_hidden_state.mean(dim=1).squeeze(0)
 
-        embeddings = torch.stack([_get_embedding(d) for d in input])
-        return {"data": [{"embedding": embeddings.tolist()}]}
+        return {"data": [
+            { "embedding": torch.stack([_get_embedding(d)]).flatten().tolist()} for d in input
+            ]}
 
     
     def embed(self, input: list[str], **embedding_params):
