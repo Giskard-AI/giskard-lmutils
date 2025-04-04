@@ -78,6 +78,6 @@ class LiteLLMModel:
         embedding_params = self._build_embedding_params(embedding_params, input)
 
         if embedding_params.get('is_local', False):
-            return self._local_embed(input, **embedding_params)
+            return self._local_embed(**embedding_params)
 
         return await aembedding(**embedding_params)
