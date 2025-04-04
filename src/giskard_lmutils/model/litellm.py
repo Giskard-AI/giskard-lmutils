@@ -16,6 +16,9 @@ class LiteLLMModel:
 
         self._completion_params = (completion_params or {}) | { 'model': completion_model }
         self._embedding_params = (embedding_params or {}) | { 'model': embedding_model }
+        self.model = None
+        self.tokenizer = None
+        self.device = None
 
     def _build_completion_params(self, completion_params, messages):
         return self._completion_params | completion_params | {'messages': messages}
