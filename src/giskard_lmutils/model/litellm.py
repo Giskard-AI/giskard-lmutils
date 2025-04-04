@@ -46,10 +46,6 @@ class LiteLLMModel:
             self.device = "cuda" if torch.cuda.is_available() else "cpu"
             self.tokenizer = AutoTokenizer.from_pretrained(embedding_params['model'])
             self.model = AutoModel.from_pretrained(embedding_params['model']).to(self.device)
-            
-
-        if self.model is None:
-            self.model = AutoModel.from_pretrained(embedding_params['model'])
 
         def _get_embedding(input: str):
             inputs = self.tokenizer(
