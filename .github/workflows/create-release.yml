@@ -1,0 +1,96 @@
+name: Release and publish a new version
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Tag to be created, in the form X.Y.Z"
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if organization member
+        id: is_organization_member
+        uses: JamesSingleton/is-organization-member@1.0.1
+        with:
+          organization: Giskard-AI
+          username: ${{ github.actor }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Interrupt job
+        if: ${{ steps.is_organization_member.outputs.result == 'false' }}
+        shell: bash
+        run: |
+          echo "Job failed due to user not being a member of Giskard-AI organization and the 'safe for build' label not being set on the PR"
+          exit 1
+
+      - name: Write release version env vars (with/without v)
+        run: |
+          VERSION_NAME="v${{ inputs.version }}"
+          VERSION_NUMBER="${VERSION_NAME:1}"
+          echo "VERSION_NUMBER=${VERSION_NUMBER}" >> $GITHUB_ENV
+          echo "VERSION_NAME=${VERSION_NAME}" >> $GITHUB_ENV
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-tags: true
+          ref: main
+          token: ${{ secrets.RELEASE_PAT_TOKEN }} # Needed to trigger other actions
+
+      - name: Edit pyproject.toml
+        run: sed -i 's/^\(version *= *\).*$/\1"${{ env.VERSION_NUMBER }}"/' pyproject.toml
+
+      - name: Setup Rye
+        uses: astral-sh/setup-rye-action@v1
+        with:
+          python-version: "3.13"
+          cache: false
+
+      - name: Install dependencies
+        run: |
+          rye sync
+          rye install
+
+      - name: Configure git
+        run: |
+          git config --global user.name 'BotReleaser'
+          git config --global user.email 'bot.releaser@users.noreply.github.com'
+
+      - name: Adding file
+        run: |
+          git add pyproject.toml
+          git fetch --quiet --tags
+          git commit -m "${{ env.VERSION_NAME }}" --allow-empty
+          git tag ${{ env.VERSION_NAME }}
+
+      - name: Push to main and tags
+        run: |
+          git push origin main
+          git push origin ${{ env.VERSION_NAME }}
+
+      # build .tar.gz sdist tarball
+      - name: Build source distribution tarball
+        run: |
+          rye build
+
+      - name: Create Github Release
+        id: github-release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.VERSION_NAME }}
+          fail_on_unmatched_files: true
+          generate_release_notes: true
+          files: |
+            dist/giskard_lmutils-*.tar.gz
+            dist/giskard_lmutils-*.whl
+
+      - name: Push to Pipy
+        run: pdm publish --no-build --username "${{ secrets.PIPY_USERNAME }}" --password "${{ secrets.PIPY_PASSWORD }}"
+
+      - name: Set job success env var
+        run: |
+          echo "JOB_SUCCESS=true" >> $GITHUB_ENV
