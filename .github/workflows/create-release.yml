@@ -45,10 +45,9 @@ jobs:
         run: sed -i 's/^\(version *= *\).*$/\1"${{ env.VERSION_NUMBER }}"/' pyproject.toml
 
       - name: Setup Rye
-        uses: astral-sh/setup-rye-action@v1
+        uses: eifinger/setup-rye@v4
         with:
-          python-version: "3.13"
-          cache: false
+          version: "latest"
 
       - name: Install dependencies
         run: |
