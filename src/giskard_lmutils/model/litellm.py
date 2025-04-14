@@ -2,6 +2,18 @@ import os
 from typing import Optional
 from litellm import completion, acompletion, embedding, aembedding
 
+try:
+    import torch
+    TORCH_AVAILABLE = True
+except ImportError:
+    TORCH_AVAILABLE = False
+
+try:
+    from transformers import AutoTokenizer, AutoModel
+    TRANSFORMERS_AVAILABLE = True
+except ImportError:
+    TRANSFORMERS_AVAILABLE = False
+
 class LiteLLMModel:
 
     def __init__(self, 
@@ -41,8 +53,19 @@ class LiteLLMModel:
 
     
     def _local_embed(self, input: list[str], **embedding_params):
-        import torch
-        from transformers import AutoTokenizer, AutoModel
+        if not TRANSFORMERS_AVAILABLE:
+            raise ImportError("""
+            transformers is not installed. Please install it with `pip install transformers`.
+            This is required to use the local embedding model.
+            Alternatively, you can use the remote embedding model.
+            """)
+        
+        if not TORCH_AVAILABLE:
+            raise ImportError("""
+            torch is not installed. Please install it with `pip install torch`.
+            This is required to use the local embedding model.
+            Alternatively, you can use the remote embedding model.
+            """)
 
         if self.model is None:
             self.device = "cuda" if torch.cuda.is_available() else "cpu"
