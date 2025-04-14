@@ -27,6 +27,20 @@ class LiteLLMModel:
 
         if completion_model is None and embedding_model is None:
             raise ValueError("Either completion_model or embedding_model must be provided")
+        
+        if completion_params.get('is_local', False) and not TORCH_AVAILABLE:
+            raise ValueError("""
+            torch is not installed. Please install it with `pip install torch`.
+            This is required to use the local embedding model.
+            Alternatively, you can use the remote embedding model by setting `is_local=False` in the embedding_params.
+            """)
+        
+        if embedding_params.get('is_local', False) and not TRANSFORMERS_AVAILABLE:
+            raise ValueError("""
+            transformers is not installed. Please install it with `pip install transformers`.
+            This is required to use the local embedding model.
+            Alternatively, you can use the remote embedding model by setting `is_local=False` in the embedding_params.
+            """)
 
         self._completion_params = {**(completion_params or {}), 'model': completion_model }
         self._embedding_params = {**(embedding_params or {}), 'model': embedding_model }
@@ -53,20 +67,6 @@ class LiteLLMModel:
 
     
     def _local_embed(self, input: list[str], **embedding_params):
-        if not TRANSFORMERS_AVAILABLE:
-            raise ImportError("""
-            transformers is not installed. Please install it with `pip install transformers`.
-            This is required to use the local embedding model.
-            Alternatively, you can use the remote embedding model.
-            """)
-        
-        if not TORCH_AVAILABLE:
-            raise ImportError("""
-            torch is not installed. Please install it with `pip install torch`.
-            This is required to use the local embedding model.
-            Alternatively, you can use the remote embedding model.
-            """)
-
         if self.model is None:
             self.device = "cuda" if torch.cuda.is_available() else "cpu"
             self.tokenizer = AutoTokenizer.from_pretrained(embedding_params['model'])
