@@ -57,8 +57,8 @@ class LiteLLMModel:
         Initialize the LiteLLMModel.
 
         Args:
-            completion_model (Optional[str]): The model to use for completion. If not provided, the environment variable GSK_COMPLETION_MODEL will be used.
-            embedding_model (Optional[str]): The model to use for embedding. If not provided, the environment variable GSK_EMBEDDING_MODEL will be used.
+            completion_model (Optional[str]): The model to use for completion, following the litellm format. If not provided, the environment variable GSK_COMPLETION_MODEL will be used.
+            embedding_model (Optional[str]): The model to use for embedding, following the litellm format. If not provided, the environment variable GSK_EMBEDDING_MODEL will be used.
             completion_params (Optional[dict]): The additional parameters to use for completion.
             embedding_params (Optional[dict]): The additional parameters to use for embedding. If is_local is True, the model will be loaded locally. Be sure to install giskard-lmutils using `pip install giskard-lmutils[local-embedding]` to use this feature.
             env_prefix (str): The prefix to use for the environment variables. Defaults to 'GSK'.
@@ -82,11 +82,25 @@ class LiteLLMModel:
         return {**self._embedding_params, **embedding_params, 'input': input}
 
     def complete(self, messages: list, **completion_params):
+        """
+        Complete a message.
+
+        Args:
+            messages (list): The messages to complete.
+            **completion_params (dict): The additional parameters to use for completion. Those will be merged with the default parameters, overriding duplicates.
+        """
         completion_params = self._build_completion_params(completion_params, messages)
 
         return completion(**completion_params)
 
     async def acomplete(self, messages: list, **completion_params):
+        """
+        Complete a message asynchronously.
+
+        Args:
+            messages (list): The messages to complete.
+            **completion_params (dict): The additional parameters to use for completion. Those will be merged with the default parameters, overriding duplicates.
+        """
         completion_params = self._build_completion_params(completion_params, messages)
 
         return await acompletion(**completion_params)
@@ -98,6 +112,13 @@ class LiteLLMModel:
             ]}
 
     def embed(self, input: list[str], **embedding_params):
+        """
+        Embed a message.
+
+        Args:
+            input (list): The messages to embed.
+            **embedding_params (dict): The additional parameters to use for embedding. Those will be merged with the default parameters, overriding duplicates.
+        """
         embedding_params = self._build_embedding_params(embedding_params, input)
 
         if embedding_params.get('is_local', False):
@@ -106,6 +127,13 @@ class LiteLLMModel:
         return embedding(**embedding_params)
     
     async def aembed(self, input: list[str], **embedding_params):
+        """
+        Embed a message asynchronously.
+
+        Args:
+            input (list): The messages to embed.
+            **embedding_params (dict): The additional parameters to use for embedding. Those will be merged with the default parameters, overriding duplicates.
+        """
         embedding_params = self._build_embedding_params(embedding_params, input)
 
         if embedding_params.get('is_local', False):
