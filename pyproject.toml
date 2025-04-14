@@ -5,6 +5,7 @@ description = "Giskard LLM Utils"
 authors = [
     { name = "Kevin Messiaen", email = "kevin@giskard.ai" }
 ]
+license = { text = "Apache Software License 2.0" }
 dependencies = [
     "numpy>=2.2.2",
     "litellm>=1.59.3",
