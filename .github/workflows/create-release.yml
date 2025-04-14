@@ -88,7 +88,7 @@ jobs:
             dist/giskard_lmutils-*.whl
 
       - name: Push to Pipy
-        run: pdm publish --no-build --username "${{ secrets.PIPY_USERNAME }}" --password "${{ secrets.PIPY_PASSWORD }}"
+        run: rye publish --username "${{ secrets.PIPY_USERNAME }}" --password "${{ secrets.PIPY_PASSWORD }} --yes"
 
       - name: Set job success env var
         run: |
