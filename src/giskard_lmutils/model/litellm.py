@@ -1,5 +1,6 @@
 import os
 from typing import Optional
+from litellm import completion, acompletion, embedding, aembedding
 
 class LiteLLMModel:
 
@@ -28,13 +29,11 @@ class LiteLLMModel:
         return {**self._embedding_params, **embedding_params, 'input': input}
 
     def complete(self, messages: list, **completion_params):
-        from litellm import completion
         completion_params = self._build_completion_params(completion_params, messages)
 
         return completion(**completion_params)
 
     async def acomplete(self, messages: list, **completion_params):
-        from litellm import acompletion
         completion_params = self._build_completion_params(completion_params, messages)
 
         return await acompletion(**completion_params)
@@ -65,8 +64,6 @@ class LiteLLMModel:
 
     
     def embed(self, input: list[str], **embedding_params):
-       
-        from litellm import embedding
         embedding_params = self._build_embedding_params(embedding_params, input)
 
         if embedding_params.get('is_local', False):
@@ -75,7 +72,6 @@ class LiteLLMModel:
         return embedding(**embedding_params)
     
     async def aembed(self, input: list[str], **embedding_params):
-        from litellm import aembedding
         embedding_params = self._build_embedding_params(embedding_params, input)
 
         if embedding_params.get('is_local', False):
