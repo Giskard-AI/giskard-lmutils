@@ -87,7 +87,7 @@ class LiteLLMModel:
 
         Args:
             messages (list): The messages to complete.
-            **completion_params (dict): The additional parameters to use for completion. Those will be merged with the default parameters, overriding duplicates.
+            **completion_params (dict): The additional parameters to use for completion. See litellm completion documentation for more details. Those will be merged with the default parameters, overriding duplicates.
         Returns:
             ModelResponse: A response object containing the generated completion and associated metadata.
         """
@@ -101,7 +101,7 @@ class LiteLLMModel:
 
         Args:
             messages (list): The messages to complete.
-            **completion_params (dict): The additional parameters to use for completion. Those will be merged with the default parameters, overriding duplicates.
+            **completion_params (dict): The additional parameters to use for completion. See litellm acompletion documentation for more details. Those will be merged with the default parameters, overriding duplicates.
         Returns:
         """
         completion_params = self._build_completion_params(completion_params, messages)
@@ -120,7 +120,7 @@ class LiteLLMModel:
 
         Args:
             input (list): The messages to embed.
-            **embedding_params (dict): The additional parameters to use for embedding. Those will be merged with the default parameters, overriding duplicates.
+            **embedding_params (dict): The additional parameters to use for embedding. See litellm embedding documentation for more details. Additionally, if is_local is True, the model will be loaded locally. Be sure to install giskard-lmutils using `pip install giskard-lmutils[local-embedding]` to use this feature.
         """
         embedding_params = self._build_embedding_params(embedding_params, input)
 
@@ -135,7 +135,7 @@ class LiteLLMModel:
 
         Args:
             input (list): The messages to embed.
-            **embedding_params (dict): The additional parameters to use for embedding. Those will be merged with the default parameters, overriding duplicates.
+            **embedding_params (dict): The additional parameters to use for embedding. See litellm aembedding documentation for more details. Additionally, if is_local is True, the model will be loaded locally. Be sure to install giskard-lmutils using `pip install giskard-lmutils[local-embedding]` to use this feature.
         """
         embedding_params = self._build_embedding_params(embedding_params, input)
 
