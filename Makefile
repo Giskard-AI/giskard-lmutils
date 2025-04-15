@@ -9,8 +9,8 @@ setup: ## Install dependencies
 .PHONY: setup
 
 format: ## Format code
-	black src tests
-	isort src tests
+	rye run black src tests
+	rye run isort src tests
 .PHONY: format
 
 check_format: ## Check format
