@@ -5,10 +5,7 @@ help: ## Display commands help
 .PHONY:
 
 setup: ## Install dependencies
-	rye sync
-	if command -v black >/dev/null 2>&1; then echo "black already installed"; else rye install black; fi
-	if command -v isort >/dev/null 2>&1; then echo "isort already installed"; else rye install isort; fi
-	if command -v ruff >/dev/null 2>&1; then echo "ruff already installed"; else rye install ruff; fi
+	rye sync --all-features
 .PHONY: setup
 
 format: ## Format code
@@ -17,10 +14,14 @@ format: ## Format code
 .PHONY: format
 
 check_format: ## Check format
-	black --check src tests
-	isort --check src tests
+	rye run black --check src tests
+	rye run isort --check src tests
 .PHONY: check_format
 
 check_linting: ## Check linting
-	ruff check src tests
+	rye run ruff check src tests
 .PHONY: check_linting
+
+test: ## Run tests
+	rye run pytest tests
+.PHONY: test
