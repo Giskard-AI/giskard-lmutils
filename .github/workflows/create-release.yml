@@ -89,7 +89,3 @@ jobs:
 
       - name: Push to Pipy
         run: rye publish --username "${{ secrets.PIPY_USERNAME }}" --password "${{ secrets.PIPY_PASSWORD }} --yes"
-
-      - name: Set job success env var
-        run: |
-          echo "JOB_SUCCESS=true" >> $GITHUB_ENV
