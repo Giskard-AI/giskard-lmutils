@@ -13,8 +13,8 @@ mock_acompletion = AsyncMock(return_value=mock_response)
 
 
 @pytest.mark.asyncio
-@patch("litellm.acompletion", mock_acompletion)
-async def test_acomplete_custom_params():
+@patch("giskard_lmutils.model.litellm.acompletion", mock_acompletion)
+async def test_find_topic():
     litellm_model = LiteLLMModel("gpt-4")
 
     topic = await find_topic(

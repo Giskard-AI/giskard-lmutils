@@ -1,7 +1,8 @@
 import os
-from typing import Optional
+from typing import Optional, Union
 
-from litellm import acompletion, aembedding, completion, embedding
+from litellm import (CustomStreamWrapper, EmbeddingResponse, ModelResponse,
+                     acompletion, aembedding, completion, embedding)
 
 try:
     import torch
@@ -39,8 +40,8 @@ class _LocalEmbeddingModel:
             )
 
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        self.model = AutoModel.from_pretrained(self.model_name).to(self.device)
-        self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+        self.model = AutoModel.from_pretrained(model).to(self.device)
+        self.tokenizer = AutoTokenizer.from_pretrained(model)
 
     def get_embedding(self, input: str):
         inputs = self.tokenizer(
@@ -97,7 +98,9 @@ class LiteLLMModel:
     def _build_embedding_params(self, embedding_params, input):
         return {**self._embedding_params, **embedding_params, "input": input}
 
-    def complete(self, messages: list, **completion_params):
+    def complete(
+        self, messages: list, **completion_params
+    ) -> Union[ModelResponse, CustomStreamWrapper]:
         """
         Complete a message.
 
@@ -111,7 +114,9 @@ class LiteLLMModel:
 
         return completion(**completion_params)
 
-    async def acomplete(self, messages: list, **completion_params):
+    async def acomplete(
+        self, messages: list, **completion_params
+    ) -> Union[ModelResponse, CustomStreamWrapper]:
         """
         Complete a message asynchronously.
 
@@ -124,9 +129,9 @@ class LiteLLMModel:
 
         return await acompletion(**completion_params)
 
-    def _local_embed(self, input: list[str]):
-        return {
-            "data": [
+    def _local_embed(self, input: list[str]) -> EmbeddingResponse:
+        return EmbeddingResponse(
+            data=[
                 {
                     "embedding": torch.stack(
                         [self._local_embedding_model.get_embedding(d)]
@@ -136,9 +141,9 @@ class LiteLLMModel:
                 }
                 for d in input
             ]
-        }
+        )
 
-    def embed(self, input: list[str], **embedding_params):
+    def embed(self, input: list[str], **embedding_params) -> EmbeddingResponse:
         """
         Embed a message.
 
@@ -153,7 +158,7 @@ class LiteLLMModel:
 
         return embedding(**embedding_params)
 
-    async def aembed(self, input: list[str], **embedding_params):
+    async def aembed(self, input: list[str], **embedding_params) -> EmbeddingResponse:
         """
         Embed a message asynchronously.
 
