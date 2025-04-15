@@ -1,5 +1,7 @@
 import logging
+
 import numpy as np
+
 from ..model import LiteLLMModel
 
 LOGGER = logging.getLogger(__name__)
@@ -16,13 +18,14 @@ The user will provide the documents, consisting in multiple paragraphs delimited
 You must output a single sentence containing the topic, without any other wrapping text or markdown.
 """
 
+
 async def find_topic(
-        model: LiteLLMModel,
-        topic_documents: list[str],
-        language: str,
-        document_max_length: int = 500, # TODO: move in config?
-        topic_document_count: int = 10, # TODO: move in config?
-        seed: int = 1729
+    model: LiteLLMModel,
+    topic_documents: list[str],
+    language: str,
+    document_max_length: int = 500,  # TODO: move in config?
+    topic_document_count: int = 10,  # TODO: move in config?
+    seed: int = 1729,
 ) -> str:
     """
     Find a topic for a set of documents.
@@ -48,18 +51,24 @@ async def find_topic(
         ]
     )
 
-    summary: str = (await model.acomplete(
-        [{
-            'role': "system",
-            'content': TOPIC_SUMMARIZATION_PROMPT.format(language=language)
-        }, {
-            'role': "user",
-            'content': topics_str
-        }],
-        temperature=0.0,
-        seed=seed,
-        json_output=False,
-    )).choices[0].message.content
+    summary: str = (
+        (
+            await model.acomplete(
+                [
+                    {
+                        "role": "system",
+                        "content": TOPIC_SUMMARIZATION_PROMPT.format(language=language),
+                    },
+                    {"role": "user", "content": topics_str},
+                ],
+                temperature=0.0,
+                seed=seed,
+                json_output=False,
+            )
+        )
+        .choices[0]
+        .message.content
+    )
 
     LOGGER.debug("Summary: %s", summary)
     return summary
