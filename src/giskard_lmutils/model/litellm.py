@@ -57,6 +57,7 @@ class _LocalEmbeddingModel:
 
         with torch.no_grad():
             outputs = self.model(**inputs)
+
         return outputs.last_hidden_state.mean(dim=1).squeeze(0)
 
 

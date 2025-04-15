@@ -1,10 +1,11 @@
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+import torch
 from litellm import Choices, EmbeddingResponse, ModelResponse
+from transformers import AutoModel, AutoTokenizer
 
 from giskard_lmutils import LiteLLMModel
-from tests.data.embedding import EMBEDDING_VALUES
 
 mock_completion_response = ModelResponse(
     choices=[Choices(message={"role": "assistant", "content": "This is an answer"})]
@@ -12,9 +13,7 @@ mock_completion_response = ModelResponse(
 mock_completion = MagicMock(return_value=mock_completion_response)
 mock_acompletion = AsyncMock(return_value=mock_completion_response)
 
-mock_embedding_response = EmbeddingResponse(
-    data=[{"embedding": EMBEDDING_VALUES["This is a test"]}]
-)
+mock_embedding_response = EmbeddingResponse(data=[{"embedding": [0.1, 0.2, 0.3]}])
 mock_embedding = MagicMock(return_value=mock_embedding_response)
 mock_aembedding = AsyncMock(return_value=mock_embedding_response)
 
@@ -134,10 +133,30 @@ async def test_aembedding_custom_params():
     assert response == mock_embedding_response
 
 
+def _compute_local_embedding(model_name: str, input: str) -> list[float]:
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+
+    model = AutoModel.from_pretrained(model_name).to(device)
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+
+    inputs = tokenizer(input, return_tensors="pt").to(device)
+
+    with torch.no_grad():
+        outputs = model(**inputs)
+
+    return outputs.last_hidden_state.mean(dim=1).squeeze(0)
+
+
 def test_local_embedding():
     litellm_model = LiteLLMModel(
         embedding_model="sentence-transformers/all-MiniLM-L6-v2",
         embedding_params={"is_local": True},
     )
     response = litellm_model.embed(["This is a test"])
-    assert response == mock_embedding_response
+    expected_embedding = _compute_local_embedding(
+        "sentence-transformers/all-MiniLM-L6-v2", "This is a test"
+    )
+    assert (
+        response.data[0]["embedding"]
+        == torch.stack([expected_embedding]).flatten().tolist()
+    )
