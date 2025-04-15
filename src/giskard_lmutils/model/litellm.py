@@ -1,8 +1,15 @@
 import os
 from typing import Optional, Union
 
-from litellm import (CustomStreamWrapper, EmbeddingResponse, ModelResponse,
-                     acompletion, aembedding, completion, embedding)
+from litellm import (
+    CustomStreamWrapper,
+    EmbeddingResponse,
+    ModelResponse,
+    acompletion,
+    aembedding,
+    completion,
+    embedding,
+)
 
 try:
     import torch

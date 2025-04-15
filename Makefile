@@ -10,12 +10,12 @@ setup: ## Install dependencies
 
 format: ## Format code
 	rye run black src tests
-	rye run isort src tests
+	rye run isort src tests --profile black
 .PHONY: format
 
 check_format: ## Check format
 	rye run black --check src tests
-	rye run isort --check src tests
+	rye run isort --check src tests --profile black
 .PHONY: check_format
 
 check_linting: ## Check linting
