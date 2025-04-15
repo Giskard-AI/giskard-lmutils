@@ -64,18 +64,18 @@ model = LiteLLMModel(
 )
 ```
 
-2. Through direct initialization:
+Note: The environment variable prefix can be customized by passing an `env_prefix` parameter to the `LiteLLMModel` initialization. This allows you to use different models within the same application by setting different environment variables (e.g., `CUSTOM_PREFIX_COMPLETION_MODEL`).
 
-# Or specify models directly
+2. Through specified model names:
 
+```python
 model = LiteLLMModel(
-completion_model="gpt-3.5-turbo",
-embedding_model="text-embedding-ada-002",
-completion_params={"temperature": 0.7},
-embedding_params={"is_local": False} # Optional, defaults to False
+    completion_model="gpt-3.5-turbo",
+    embedding_model="text-embedding-ada-002",
+    completion_params={"temperature": 0.7},
+    embedding_params={"is_local": False}  # Optional, defaults to False
 )
-
-````
+```
 
 Note: When using OpenAI models, you must set the `OPENAI_API_KEY` environment variable. For other providers, refer to the [LiteLLM documentation](https://github.com/BerriAI/litellm) for their specific API key requirements.
 
@@ -93,7 +93,7 @@ response = model.complete([
 response = await model.acomplete([
     {"role": "user", "content": "What is the capital of France?"}
 ])
-````
+```
 
 #### Text Embedding
 
