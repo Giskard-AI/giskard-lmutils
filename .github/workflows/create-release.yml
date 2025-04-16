@@ -44,15 +44,12 @@ jobs:
       - name: Edit pyproject.toml
         run: sed -i 's/^\(version *= *\).*$/\1"${{ env.VERSION_NUMBER }}"/' pyproject.toml
 
-      - name: Setup Rye
-        uses: eifinger/setup-rye@v4
-        with:
-          version: "latest"
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
 
       - name: Install dependencies
         run: |
-          rye sync
-          rye install
+          make setup
 
       - name: Configure git
         run: |
@@ -74,7 +71,7 @@ jobs:
       # build .tar.gz sdist tarball
       - name: Build source distribution tarball
         run: |
-          rye build
+          uv build
 
       - name: Create Github Release
         id: github-release
@@ -88,4 +85,4 @@ jobs:
             dist/giskard_lmutils-*.whl
 
       - name: Push to Pipy
-        run: rye publish --username "${{ secrets.PIPY_USERNAME }}" --password "${{ secrets.PIPY_PASSWORD }} --yes"
+        run: uv publish --username "${{ secrets.PIPY_USERNAME }}" --password "${{ secrets.PIPY_PASSWORD }}"

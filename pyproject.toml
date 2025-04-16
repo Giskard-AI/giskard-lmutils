@@ -11,7 +11,7 @@ dependencies = [
     "litellm>=1.59.3",
 ]
 readme = "README.md"
-requires-python = ">= 3.9, <3.14"
+requires-python = ">= 3.10, <3.14"
 
 [project.optional-dependencies]
 local-embedding = [
@@ -23,18 +23,17 @@ local-embedding = [
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.rye]
-managed = true
-dev-dependencies = [
-    "pytest>=8.3.5",
-    "pytest-asyncio>=0.25.2",
-    "black>=25.1.0",
-    "isort>=6.0.1",
-    "ruff>=0.11.5",
-]
-
 [tool.hatch.metadata]
 allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/giskard_lmutils"]
+
+[dependency-groups]
+dev = [
+    "black>=25.1.0",
+    "isort>=6.0.1",
+    "pytest>=8.3.5",
+    "pytest-asyncio>=0.26.0",
+    "ruff>=0.11.5",
+]

@@ -31,7 +31,7 @@ This will install the required dependencies (`torch` and `transformers`) for run
 
 ### Development Installation
 
-1. Install python, Rye and make
+1. Install python, [UV](https://github.com/astral-sh/uv) and make
 2. Clone this repository
 3. Setup the virtual environment using `make setup`
 

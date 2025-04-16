@@ -5,23 +5,23 @@ help: ## Display commands help
 .PHONY:
 
 setup: ## Install dependencies
-	rye sync --all-features
+	uv sync --all-extras
 .PHONY: setup
 
 format: ## Format code
-	rye run black src tests
-	rye run isort src tests --profile black
+	uv run -- black src tests
+	uv run -- isort src tests --profile black
 .PHONY: format
 
 check_format: ## Check format
-	rye run black --check src tests
-	rye run isort --check src tests --profile black
+	uv run -- black --check src tests
+	uv run -- isort --check src tests --profile black
 .PHONY: check_format
 
 check_linting: ## Check linting
-	rye run ruff check src tests
+	uv run -- ruff check src tests
 .PHONY: check_linting
 
 test: ## Run tests
-	rye run pytest tests
+	uv run -- pytest tests
 .PHONY: test
