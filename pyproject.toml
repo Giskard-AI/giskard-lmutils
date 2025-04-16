@@ -1,6 +1,6 @@
 [project]
 name = "giskard-lmutils"
-version = "0.1.0"
+version = "1.0.0"
 description = "Giskard LLM Utils"
 authors = [
     { name = "Kevin Messiaen", email = "kevin@giskard.ai" }
